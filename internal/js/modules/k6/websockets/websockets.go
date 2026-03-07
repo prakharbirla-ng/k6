@@ -695,6 +695,7 @@ func (w *webSocket) ping() {
 
 	pingID := strconv.Itoa(w.sendPings.counter)
 
+	w.bufferedAmount += len(pingID)
 	w.writeQueueCh <- message{
 		mtype: websocket.PingMessage,
 		data:  []byte(pingID),
