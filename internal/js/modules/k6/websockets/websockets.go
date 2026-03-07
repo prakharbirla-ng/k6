@@ -608,6 +608,7 @@ func (w *webSocket) send(msg sobek.Value) {
 	switch o := msg.Export().(type) {
 	case string:
 		w.bufferedAmount += len(o)
+		w.vu.State().Logger.Warnf("K6WebSocket: Sending string of length %d", len(o))
 		w.writeQueueCh <- message{
 			mtype: websocket.TextMessage,
 			data:  []byte(o),
@@ -625,6 +626,7 @@ func (w *webSocket) send(msg sobek.Value) {
 		}
 
 		b := extractBytes(obj, rt)
+		w.vu.State().Logger.Warnf("K6WebSocket: Sending Any of length %d", len(b))
 		w.bufferedAmount += len(b)
 		w.writeQueueCh <- message{
 			mtype: websocket.BinaryMessage,
@@ -648,6 +650,7 @@ func (w *webSocket) send(msg sobek.Value) {
 			common.Throw(rt,
 				fmt.Errorf("got error while trying to export ArrayBufferView to bytes: %w", err))
 		}
+		w.vu.State().Logger.Warnf("K6WebSocket: Sending Array Buffer View of length %d", len(b))
 		w.bufferedAmount += len(b)
 		w.writeQueueCh <- message{
 			mtype: websocket.BinaryMessage,
@@ -659,6 +662,7 @@ func (w *webSocket) send(msg sobek.Value) {
 
 func (w *webSocket) sendArrayBuffer(o sobek.ArrayBuffer) {
 	b := o.Bytes()
+	w.vu.State().Logger.Warnf("K6WebSocket: Sending Array Buffer of length %d", len(b))
 	w.bufferedAmount += len(b)
 	w.writeQueueCh <- message{
 		mtype: websocket.BinaryMessage,
